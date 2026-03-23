@@ -1,0 +1,108 @@
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-style: normal;
+  src:
+    url('./assets/fonts/Pretendard-Regular.woff2') format('woff2'),
+    url('./assets/fonts/Pretendard-Regular.woff') format('woff');
+}
+
+/* 기본 초기화 및 배경 설정 */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #ffffff; /* PC에서 볼 때 외곽 배경색 */
+  font-family:
+    'Pretendard',
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    Roboto,
+    sans-serif;
+}
+
+#app-wrapper {
+  /* vh, dvh 대신 position fixed로 전체 화면을 점유하게 합니다. */
+  position: fixed;
+  inset: 0; /* top, right, bottom, left 모두 0 */
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+#game-container {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  /* 하단 바에 의해 잘리지 않도록 확실히 처리 */
+  height: calc(100% - 80px);
+}
+
+.bottom-nav {
+  /* 아이폰/안드로이드 하단바 유동 높이 대응 */
+  height: 80px;
+  padding-bottom: env(safe-area-inset-bottom); /* iOS 필수 */
+  box-sizing: content-box; /* 높이 120px + 패딩이 더해지도록 설정 */
+
+  flex-shrink: 0; /* 중요: 공간이 부족해도 줄어들지 않음 */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: white;
+  border-top: 1px solid rgba(168, 197, 222, 0.3);
+}
+/* 개별 네비게이션 아이템 */
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #9ca3af;
+  cursor: cursor;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  flex: 1;
+  height: 100%;
+  -webkit-tap-highlight-color: transparent; /* 모바일 터치 시 파란 박스 제거 */
+}
+
+/* 활성화 상태 (Active) */
+.nav-item.active {
+  color: #a8c5de;
+}
+
+/* 아이콘 스타일 수정 */
+.icon {
+  width: 23px;
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 기존 mask 관련 속성은 제거합니다. */
+}
+
+/* SVG 내부 색상 제어 */
+.icon svg {
+  width: 100%;
+  height: 100%;
+  color: currentColor; /* 부모(.nav-item)의 color 값을 따름 */
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
+}
+
+/* 활성화 상태 (Active) 효과 */
+.nav-item.active .icon svg {
+  transform: translateY(-3px) scale(1.05); /* 살짝 위로 이동 및 확대 */
+  /* 포인트 컬러 글로우 효과 */
+  filter: drop-shadow(0 0 6px rgba(168, 197, 222, 0.7));
+}

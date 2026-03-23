@@ -1,0 +1,23 @@
+{
+  "name": "lifting-interactive-web",
+  "description": "실 리프팅 원리 체험을 위한 인터랙티브 웹 앱 (Phaser3 + Vercel + MongoDB)",
+  "version": "1.0.0",
+  "type": "module",
+  "author": "goodbyeFlash",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build --config vite/config.prod.mjs",
+    "preview": "vite preview",
+    "vercel-dev": "vercel dev"
+  },
+  "dependencies": {
+    "mongodb": "^6.5.0",
+    "phaser": "^3.90.0",
+    "webfontloader": "^1.6.28"
+  },
+  "devDependencies": {
+    "terser": "^5.39.0",
+    "vercel": "^50.25.4",
+    "vite": "^6.3.1"
+  }
+}
