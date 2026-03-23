@@ -11,10 +11,6 @@ export class Preloader extends Scene {
   }
 
   async handleVisitorLog() {
-    // 모바일 기기 여부 체크
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (!isMobile) return;
-
     let uuid = localStorage.getItem('user_uuid');
 
     // UUID가 없으면 새로 생성
