@@ -7,42 +7,42 @@ export class Scene1 extends Scene {
 
     this.config = {
       // --- [리프팅 실 (Lifting) 설정] ---
-      liftStrength: 0.02,
-      bulgeStrength: 0,
-      maxDragRange: 30,
-      cardW: 660,
-      cardH: 450,
+      liftStrength: 0.02, // 실을 당길 때 피부 조직이 딸려오는 물리적 저항 강도
+      bulgeStrength: 0, // 완료 시 평평함을 유지하기 위해 들림/부풀어오름 효과를 0으로 설정
+      maxDragRange: 30, // 실을 우측으로 당길 수 있는 최대 거리 한계치
+      cardW: 660, // 시뮬레이션 내용이 담기는 흰색 배경 카드의 너비
+      cardH: 450, // 시뮬레이션 내용이 담기는 흰색 배경 카드의 높이
 
       // --- [리프팅 피부 초기 주름 설정] ---
-      initialBumpyIntensity: 0.05,
-      initialBumpyFrequency: 4,
-      initialBumpyRange: 0.2,
-      flattenFactor: 1.0,
+      initialBumpyIntensity: 0.05, // 시술 전 상단 피부의 기본 주름 깊이 세기
+      initialBumpyFrequency: 4, // 상단 피부에 발생하는 주름의 가로 반복 횟수
+      initialBumpyRange: 0.2, // 주름이 이미지 상단으로부터 영향을 미치는 세로 범위 지수
+      flattenFactor: 1.0, // 실을 당길 때 주름이 완벽하게(100%) 펴지도록 설정
 
       // --- [리프팅 실 놓았을 때(시술 후) 주름 설정] ---
-      postLiftBumpyIntensity: 0,
-      postLiftBumpyFrequency: 4,
-      postLiftBumpyRange: 0.2,
+      postLiftBumpyIntensity: 0, // 되돌릴 때 일자 유지를 위해 남게 될 주름의 세기를 0으로 설정
+      postLiftBumpyFrequency: 4, // 실을 놓은 후 남게 될 주름의 빈도
+      postLiftBumpyRange: 0.2, // 실을 놓은 후 남게 될 주름의 세로 범위
 
       // --- [고정용 실 (Fixing) 설정] ---
-      bumpyIntensity: 0.005,
-      bumpyFrequency: 4,
-      bumpyDepthFix: 10,
-      fixDragSensitivity: 0.1,
+      bumpyIntensity: 0.005, // 고정용 실 드래그 시 발생하는 추가 주름(왜곡)의 세기
+      bumpyFrequency: 4, // 고정용 실 특유의 촘촘하고 자잘한 가시 주름 빈도
+      bumpyDepthFix: 10, // 고정용 주름이 세로 방향으로 감쇄되는 정도
+      fixDragSensitivity: 0.1, // 고정 실 드래그 감도 (낮을수록 무겁고 천천히 당겨짐)
 
       // --- [고정용 피부 초기 주름 설정] ---
-      initialFixBumpyIntensity: 0.025,
-      initialFixBumpyFrequency: 6,
-      initialFixBumpyRange: 0.2,
+      initialFixBumpyIntensity: 0.025, // 고정용 피부 시술 전 기본 주름 깊이 세기
+      initialFixBumpyFrequency: 6, // 고정용 피부 기본 주름 반복 횟수
+      initialFixBumpyRange: 0.2, // 고정용 피부 초기 주름 세로 범위
 
       // --- [고정용 피부 기울어졌을 때 주름 설정] ---
-      tiltFixBumpyIntensity: 0,
-      tiltFixBumpyFrequency: 4,
-      tiltFixBumpyRange: 0.2,
+      tiltFixBumpyIntensity: 0, // 클릭하여 기울어졌을 때 남을 주름 세기
+      tiltFixBumpyFrequency: 4, // 클릭하여 기울어졌을 때 남을 주름 빈도
+      tiltFixBumpyRange: 0.2, // 클릭하여 기울어졌을 때 남을 주름 범위
 
       // --- [클릭 어포던스 설정] ---
-      affordanceColor: '#ffffff',
-      affordanceFontSize: '60px',
+      affordanceColor: '#ffffff', // 시술 실패 후 클릭 유도를 위한 플러스(+) 아이콘 색상
+      affordanceFontSize: '60px', // 클릭 유도 플러스(+) 아이콘의 글자 크기
     };
 
     this.baseThreadScale = 0.6;
@@ -335,8 +335,8 @@ export class Scene1 extends Scene {
             ease: 'Cubic.easeInOut',
             onComplete: () => {
               this.isSection2Failed = true;
-              this.fixThread.setOrigin(0, 0.5);
-              this.fixThread.setPosition(this.threadInsertionX - this.startX, -40);
+              //this.fixThread.setOrigin(0, 0.5);
+              //this.fixThread.setPosition(this.threadInsertionX - this.startX, -40);
               this.fixThread.disableInteractive();
               this.currentFixBumpyIntensity = 0;
             },
