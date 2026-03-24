@@ -93,7 +93,7 @@ export class Preloader extends Scene {
 
     // [Scene 2] PDO, PCL 실 이미지
     this.load.image('thread_pdo', '/assets/images/thread_lifting.png');
-    this.load.image('thread_pcl', '/assets/images/thread_lifting.png');
+    this.load.image('thread_pcl', '/assets/images/thread_lifting_white.png');
     this.load.image('weight', '/assets/images/weight.png');
 
     // [Scene 3] 얼굴 근육 스프라이트 시트

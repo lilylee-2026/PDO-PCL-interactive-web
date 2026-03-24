@@ -61,7 +61,7 @@ export class Home extends Scene {
     const textLeftMargin = -cardWidth / 2 + 50;
 
     // 텍스트 (Title)
-    const titleText = this.add.text(textLeftMargin, -40, data.title, {
+    const titleText = this.add.text(textLeftMargin, -20, data.title, {
       fontSize: '34px',
       fontFamily: 'Pretendard, Arial',
       color: '#1f2937',

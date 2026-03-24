@@ -28,6 +28,7 @@ export class Scene1 extends Scene {
       bumpyIntensity: 0.005, // 고정용 실 드래그 시 발생하는 추가 주름(왜곡)의 세기
       bumpyFrequency: 4, // 고정용 실 특유의 촘촘하고 자잘한 가시 주름 빈도
       bumpyDepthFix: 10, // 고정용 주름이 세로 방향으로 감쇄되는 정도
+      fixDragSensitivity: 0.1, // 고정 실 드래그 감도 (낮을수록 무겁고 천천히 당겨짐)
 
       // --- [고정용 피부 초기 주름 설정] ---
       initialFixBumpyIntensity: 0.025, // 고정용 피부 시술 전 기본 주름 깊이 세기
@@ -46,22 +47,27 @@ export class Scene1 extends Scene {
 
     this.baseThreadScale = 0.6;
     this.threadStretchDenom = 300;
+  }
+
+  preload() {
+    this.load.json('config', 'assets/config/config.json');
+  }
+
+  create() {
+    // 🚨 [초기화 핵심] 화면에 진입할 때마다 상태 변수들을 초기값으로 리셋합니다.
+    this.isSection2Failed = false;
     this.maxLiftingDist = 0;
     this.maxFixedDist = 0;
-    this.isSection2Failed = false;
-
-    // 실시간 상태 관리 변수
     this.currentLiftBumpyIntensity = this.config.initialBumpyIntensity;
     this.currentLiftBumpyFrequency = this.config.initialBumpyFrequency;
     this.currentLiftBumpyRange = this.config.initialBumpyRange;
     this.currentFixBumpyIntensity = this.config.initialFixBumpyIntensity;
-  }
 
-  create() {
     const { width } = this.scale;
     const centerX = width / 2;
     this.cameras.main.setBackgroundColor('#ffffff');
 
+    // 뒤로가기 버튼
     this.add
       .text(40, 60, '←', { fontSize: '40px', color: '#000000', fontFamily: 'Pretendard, Arial' })
       .setOrigin(0, 0.5)
@@ -85,7 +91,10 @@ export class Scene1 extends Scene {
     this.threadInsertionX = centerX - visualThreadWidth / 2;
 
     const configData = this.cache.json.get('config');
-    const screenData = configData?.scene1 || [];
+    const screenData = configData?.scene1 || {
+      liftingSection: { title: 'Lifting', desc: '' },
+      fixingSection: { title: 'Fixing', desc: '' },
+    };
 
     // --- 리프팅 섹션 (상단) ---
     this.drawCardBg(centerX, 415, screenData.liftingSection.title, screenData.liftingSection.desc);
@@ -97,9 +106,6 @@ export class Scene1 extends Scene {
       u: v.u,
       v: v.v,
     }));
-
-    // 초기 상태 설정
-    this.currentLiftBumpyIntensity = this.config.initialBumpyIntensity;
     this.updateLiftingSkin(0);
 
     this.liftingThread = this.add
@@ -118,7 +124,6 @@ export class Scene1 extends Scene {
       u: v.u,
       v: v.v,
     }));
-    this.currentFixBumpyIntensity = this.config.initialFixBumpyIntensity;
     this.updateFixedSkin(0);
 
     this.fixThread = this.add
@@ -142,6 +147,9 @@ export class Scene1 extends Scene {
       .setOrigin(0.5)
       .setAlpha(0)
       .setDepth(11);
+
+    // 어포던스 트윈 초기화 및 생성
+    if (this.affordanceTween) this.affordanceTween.remove();
     this.affordanceTween = this.tweens.add({
       targets: this.clickAffordance,
       alpha: 0.2,
@@ -151,7 +159,6 @@ export class Scene1 extends Scene {
       paused: true,
     });
 
-    this.isSection2Failed = false;
     this.setupDragEvents();
   }
 
@@ -161,66 +168,64 @@ export class Scene1 extends Scene {
       const dragDistance = Math.max(0, pointer.x - pointer.downX);
 
       if (gameObject === this.liftingThread) {
-        const offset = Phaser.Math.Clamp(
-          dragDistance + (this.maxLiftingDist || 0),
-          0,
-          this.config.maxDragRange,
-        );
-        gameObject.x = this.threadInsertionX;
+        const offset = Phaser.Math.Clamp(dragDistance, 0, this.config.maxDragRange);
         gameObject.scaleX = this.baseThreadScale + offset / this.threadStretchDenom;
-
-        // 드래그 중 업데이트
         this.updateLiftingSkin(offset);
       } else if (gameObject === this.fixThread) {
-        const offset = Phaser.Math.Clamp(dragDistance, 0, this.config.maxDragRange);
-        gameObject.x = this.threadInsertionX;
+        const slowDragDistance = dragDistance * this.config.fixDragSensitivity;
+        const offset = Phaser.Math.Clamp(slowDragDistance, 0, this.config.maxDragRange);
         gameObject.scaleX = this.baseThreadScale + offset / this.threadStretchDenom;
         this.maxFixedDist = offset;
-        this.updateFixedSkin(offset);
-        if (offset >= this.config.maxDragRange && !this.isSection2Failed) {
-          this.triggerSection2Failure(gameObject);
-        }
+        this.updateFixedSkin(this.maxFixedDist);
       }
     });
 
     this.input.on('dragend', (pointer, gameObject) => {
+      const dragDistance = Math.max(0, pointer.x - pointer.downX);
+
       if (gameObject === this.liftingThread) {
-        this.liftingThread.disableInteractive();
-        // 리프팅 실을 놓았을 때: 실은 제자리로 (Cubic으로 쫀득하게) 원복
         this.tweens.add({
           targets: gameObject,
           scaleX: this.baseThreadScale,
-          duration: 300,
-          ease: 'Cubic.easeOut', // 원복은 쫀득한 느낌 부여
-        });
-
-        // 피부 조직 애니메이션(트윈) 제거
-        // 놓는 순간 즉시 PostLift(매끈한) 수치로 상태를 변경하고, 조직을 업데이트하여 일자로 고정
-        this.currentLiftBumpyIntensity = this.config.postLiftBumpyIntensity;
-        this.currentLiftBumpyFrequency = this.config.postLiftBumpyFrequency;
-        this.currentLiftBumpyRange = this.config.postLiftBumpyRange;
-        this.updateLiftingSkin(0); // 피부는 애니메이션 없이 즉시 일자로 업데이트
-
-        // 나머지 상태 초기화 (트윈 없이 즉시)
-        this.tweens.add({
-          targets: this,
-          duration: 300,
-          onComplete: () => {
-            this.maxLiftingDist = 0;
-          },
-        });
-      } else if (gameObject === this.fixThread && !this.isSection2Failed) {
-        this.tweens.add({
-          targets: gameObject,
-          scaleX: this.baseThreadScale,
-          duration: 2500,
-          ease: 'Linear',
+          duration: 400,
+          ease: 'Back.easeOut',
           onUpdate: () => {
-            const currentScaleDelta = gameObject.scaleX - this.baseThreadScale;
-            this.maxFixedDist = currentScaleDelta * this.threadStretchDenom;
-            this.updateFixedSkin(this.maxFixedDist);
+            if (dragDistance < this.config.maxDragRange) {
+              const currentOffset =
+                (gameObject.scaleX - this.baseThreadScale) * this.threadStretchDenom;
+              this.updateLiftingSkin(Math.max(0, currentOffset));
+            }
           },
         });
+
+        if (dragDistance >= this.config.maxDragRange) {
+          this.liftingThread.disableInteractive();
+          this.currentLiftBumpyIntensity = this.config.postLiftBumpyIntensity;
+          this.updateLiftingSkin(0);
+          this.maxLiftingDist = 0;
+        }
+      } else if (gameObject === this.fixThread && !this.isSection2Failed) {
+        const slowDragDistance = dragDistance * this.config.fixDragSensitivity;
+
+        if (slowDragDistance >= this.config.maxDragRange) {
+          this.triggerSection2Failure(gameObject);
+        } else {
+          this.tweens.add({
+            targets: gameObject,
+            scaleX: this.baseThreadScale,
+            duration: 800,
+            ease: 'Cubic.easeOut',
+            onUpdate: () => {
+              const currentOffset =
+                (gameObject.scaleX - this.baseThreadScale) * this.threadStretchDenom;
+              this.maxFixedDist = Math.max(0, currentOffset);
+              this.updateFixedSkin(this.maxFixedDist);
+            },
+            onComplete: () => {
+              this.maxFixedDist = 0;
+            },
+          });
+        }
       }
     });
   }
@@ -229,18 +234,20 @@ export class Scene1 extends Scene {
     this.isSection2Failed = true;
     gameObject.disableInteractive();
     const currentWidth = gameObject.width * gameObject.scaleX;
-    this.errorMark.setPosition(gameObject.x + currentWidth / 2, gameObject.y).setAlpha(1);
-    this.time.delayedCall(3000, () => {
-      this.errorMark.setVisible(false).setAlpha(0);
-      gameObject.setVisible(false);
-      gameObject.scaleX = this.baseThreadScale;
-      this.tweens.add({
-        targets: this,
-        maxFixedDist: 0,
-        duration: 2500,
-        ease: 'Cubic.easeOut',
-        onUpdate: () => this.updateFixedSkin(this.maxFixedDist),
-        onComplete: () => this.makeSkinTiltable(),
+    this.time.delayedCall(1000, () => {
+      this.errorMark.setPosition(gameObject.x + currentWidth / 2 - 20, gameObject.y).setAlpha(1);
+      this.time.delayedCall(3000, () => {
+        this.errorMark.setVisible(false).setAlpha(0);
+        gameObject.setVisible(false);
+        gameObject.scaleX = this.baseThreadScale;
+        this.tweens.add({
+          targets: this,
+          maxFixedDist: 0,
+          duration: 2500,
+          ease: 'Cubic.easeOut',
+          onUpdate: () => this.updateFixedSkin(this.maxFixedDist),
+          onComplete: () => this.makeSkinTiltable(),
+        });
       });
     });
   }
@@ -266,10 +273,7 @@ export class Scene1 extends Scene {
       this.tweens.add({
         targets: this,
         currentFixBumpyIntensity: this.config.tiltFixBumpyIntensity,
-        currentFixBumpyFrequency: this.config.tiltFixBumpyFrequency,
-        currentFixBumpyRange: this.config.tiltFixBumpyRange,
         duration: 1500,
-        ease: 'Cubic.easeOut',
         onUpdate: () => this.updateFixedSkin(0),
       });
       this.tweens.add({
@@ -278,7 +282,6 @@ export class Scene1 extends Scene {
         duration: 1500,
         ease: 'Back.easeOut',
         onComplete: () => {
-          // [딜레이 1] 기울기 완료 후 1초 대기
           this.time.delayedCall(1000, () => this.recoverySequence());
         },
       });
@@ -287,23 +290,26 @@ export class Scene1 extends Scene {
 
   recoverySequence() {
     const targetY = 880;
-    this.fixThread.setOrigin(0.5, 0.5);
+    this.fixThread.setOrigin(0.5, 0.5).setAngle(25).setAlpha(0).setVisible(true);
     this.fixThread.scaleX = this.baseThreadScale;
-    this.fixThread.setAngle(25);
-    const startOuterX = this.startX + 50;
-    const startOuterY = targetY + 20;
-    this.fixThread.setPosition(startOuterX, startOuterY);
-    this.fixThread.setAlpha(0).setVisible(true);
+    this.fixThread.setPosition(this.startX + 50, targetY + 20);
+
     this.tweens.add({
       targets: this.fixThread,
-      x: this.threadInsertionX + (780 * this.baseThreadScale) / 2,
+      x: this.threadInsertionX + (740 * this.baseThreadScale) / 2,
       y: targetY,
       alpha: 1,
       duration: 1500,
       ease: 'Power2.easeOut',
       onComplete: () => {
-        // [딜레이 2] 1초 대기
         this.time.delayedCall(1000, () => {
+          this.tweens.add({
+            targets: this,
+            currentFixBumpyIntensity: 0,
+            duration: 2500,
+            ease: 'Cubic.easeInOut',
+            onUpdate: () => this.updateFixedSkin(0),
+          });
           this.tweens.add({
             targets: [this.fixSkin, this.fixThread],
             angle: 0,
@@ -312,6 +318,7 @@ export class Scene1 extends Scene {
             onComplete: () => {
               this.isSection2Failed = false;
               this.currentFixBumpyIntensity = this.config.initialFixBumpyIntensity;
+              //this.fixThread.setInteractive();
             },
           });
         });
@@ -320,58 +327,34 @@ export class Scene1 extends Scene {
   }
 
   updateLiftingSkin(currentDistance) {
-    const { bulgeStrength, flattenFactor } = this.config;
+    const { bulgeStrength, flattenFactor, maxDragRange } = this.config;
     const vertices = this.liftingSkin.vertices;
-
-    // 현재 상태 변수 사용
-    const intensity = this.currentLiftBumpyIntensity;
-    const frequency = this.currentLiftBumpyFrequency;
-    const range = this.currentLiftBumpyRange;
-
     for (let i = 0; i < vertices.length; i++) {
       const v = vertices[i];
       const o = this.originalVertices[i];
-      const wave = Math.sin(o.u * Math.PI * frequency);
-      const rangeAttenuation = Math.max(0, (range - o.v) / range);
-
-      // 당기는 거리(currentDistance)가 maxDragRange에 도달할수록 펴짐 효과(currentFlattening)가 0에 수렴
-      const currentFlattening = Math.max(
+      const wave = Math.sin(o.u * Math.PI * this.config.initialBumpyFrequency);
+      const rangeAttenuation = Math.max(
         0,
-        1 - (currentDistance / this.config.maxDragRange) * flattenFactor,
+        (this.config.initialBumpyRange - o.v) / this.config.initialBumpyRange,
       );
-
-      const wrinkleY = wave * intensity * rangeAttenuation * currentFlattening;
-
-      const focalPointU = 0.7;
-      const focalPointV = 0.0;
-      const diffU = o.u - focalPointU;
-      const diffV = o.v - focalPointV;
-      const localizedBulgeWeight = Math.exp(-(diffU * diffU * 2 + diffV * diffV * 5));
-
-      // bulgeStrength가 0이므로 tensionY는 항상 0이 되어, 오른쪽 조직이 들리는 현상이 사라짐
-      const tensionY = currentDistance * bulgeStrength * localizedBulgeWeight;
-
-      // 최종적으로 주름(wrinkleY)이 0이 되고 tensionY도 0이 되어 완벽한 일자(o.y) 상태로 복귀함
-      v.y = o.y + wrinkleY + tensionY;
+      const currentFlattening = Math.max(0, 1 - (currentDistance / maxDragRange) * flattenFactor);
+      const wrinkleY = wave * this.currentLiftBumpyIntensity * rangeAttenuation * currentFlattening;
+      v.y = o.y + wrinkleY;
     }
   }
 
   updateFixedSkin(distance) {
-    const {
-      bumpyIntensity,
-      bumpyFrequency,
-      bumpyDepthFix,
-      initialFixBumpyFrequency,
-      initialFixBumpyRange,
-    } = this.config;
+    const { bumpyIntensity, bumpyFrequency, bumpyDepthFix } = this.config;
     const vertices = this.fixSkin.vertices;
-    const currentIntensity = this.currentFixBumpyIntensity;
     for (let i = 0; i < vertices.length; i++) {
       const v = vertices[i];
       const o = this.fixOriginalVertices[i];
-      const baseWave = Math.sin(o.u * Math.PI * initialFixBumpyFrequency);
-      const rangeAttenuation = Math.max(0, (initialFixBumpyRange - o.v) / initialFixBumpyRange);
-      const initialWrinkle = baseWave * currentIntensity * rangeAttenuation;
+      const baseWave = Math.sin(o.u * Math.PI * this.config.initialFixBumpyFrequency);
+      const rangeAttenuation = Math.max(
+        0,
+        (this.config.initialFixBumpyRange - o.v) / this.config.initialFixBumpyRange,
+      );
+      const initialWrinkle = baseWave * this.currentFixBumpyIntensity * rangeAttenuation;
       const wave = Math.sin(o.u * Math.PI * bumpyFrequency);
       const verticalDecay = Math.pow(1 - o.v, bumpyDepthFix);
       const horizontalFocus = Math.cos((o.u - 0.5) * Math.PI);

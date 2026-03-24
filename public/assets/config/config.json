@@ -4,39 +4,39 @@
       {
         "id": 1,
         "key": "Scene1",
-        "title": "리프팅 시뮬레이션",
-        "desc": "실시간 조직 변화를 확인하세요."
+        "title": "PDO 실 당겨보기",
+        "desc": ""
       },
       {
         "id": 2,
         "key": "Scene2",
-        "title": "무게 추 테스트",
-        "desc": "하중에 따른 고정력을 측정합니다.1"
+        "title": "PDO / PCL 탄성력 테스트",
+        "desc": ""
       },
       {
         "id": 3,
         "key": "Scene3",
-        "title": "결과 분석",
-        "desc": "상세 데이터를 비교 분석합니다."
+        "title": "PDO / PCL 입 당겨보기",
+        "desc": ""
       }
     ]
   },
   "scene1": {
     "liftingSection": {
-      "title": "리프팅 실 (Lifting)",
-      "desc": "실을 당겨 피부를 매끄럽게 펴줍니다"
+      "title": "Bi-directional",
+      "desc": "실을 우측으로 당겨 매끄럽게 펴보세요."
     },
     "fixingSection": {
-      "title": "고정용 실 (Fixing)",
-      "desc": "실의 가시가 피부를 촘촘하게 잡아줍니다"
+      "title": "Multi-directional (Fixation)",
+      "desc": "실을 우측으로 당겨보세요."
     }
   },
   "scene2": {
     "title": "PDO VS PCL",
-    "desc": "두 가지 다른 고정 방식을 비교해보세요."
+    "desc": "추를 달아 두 가지 성분의 탄성력을 비교해보세요."
   },
   "scene3": {
-    "title": "비교",
-    "desc": "각 실의 성능을 한눈에 확인하세요."
+    "title": "PDO / PCL",
+    "desc": "입을 아래로 당겨 움직임 정도를 비교해보세요."
   }
 }

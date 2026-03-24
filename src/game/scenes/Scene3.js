@@ -95,7 +95,11 @@ export class Scene3 extends Scene {
           .setAngle(110)
           .setOrigin(0.5);
 
-        if (index === 2) thread.setAlpha(0.6); // PCL 시각화
+        if (index === 2) {
+          thread
+            .setTint(0xffffff) // 중요: 연한 그레이 톤을 주어야 흰 배경에서 형태가 보입니다.
+            .setAlpha(0.5); // 중요: 0.5 정도가 가장 '반투명한 플라스틱' 느낌이 납니다.
+        } // PCL 시각화
 
         this.add
           .text(pos.x, pos.y + 180, materialName, {
@@ -133,7 +137,7 @@ export class Scene3 extends Scene {
       const graphics = this.pointGraphicsArr[index];
       const originY = point.getData('originY');
 
-      // 🚨 pointerdown 이벤트를 통해 드래그 시작 시 입력 매니저를 다시 한번 리셋할 수도 있습니다.
+      // pointerdown 이벤트를 통해 드래그 시작 시 입력 매니저를 다시 한번 리셋할 수도 있습니다.
       point.on('drag', (pointer, dragX, dragY) => {
         graphics.setVisible(false);
 
