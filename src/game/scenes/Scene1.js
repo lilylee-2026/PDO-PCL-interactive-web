@@ -63,7 +63,7 @@ export class Scene1 extends Scene {
 
     const { width } = this.scale;
     const centerX = width / 2;
-    this.cameras.main.setBackgroundColor('#ffffff');
+    this.cameras.main.setBackgroundColor('#acbac4');
 
     this.add
       .text(40, 60, '←', { fontSize: '40px', color: '#000000', fontFamily: 'Pretendard, Arial' })
@@ -72,7 +72,7 @@ export class Scene1 extends Scene {
       .on('pointerdown', () => navigateTo(this, 'Home'));
 
     this.add
-      .text(centerX, 60, '리프팅 VS 고정용', {
+      .text(centerX, 60, '실 당겨보기', {
         fontSize: '32px',
         color: '#1f2937',
         fontFamily: 'Pretendard, Arial',
@@ -335,8 +335,6 @@ export class Scene1 extends Scene {
             ease: 'Cubic.easeInOut',
             onComplete: () => {
               this.isSection2Failed = true;
-              //this.fixThread.setOrigin(0, 0.5);
-              //this.fixThread.setPosition(this.threadInsertionX - this.startX, -40);
               this.fixThread.disableInteractive();
               this.currentFixBumpyIntensity = 0;
             },
@@ -388,9 +386,9 @@ export class Scene1 extends Scene {
   drawCardBg(x, y, title, desc) {
     const { cardW, cardH } = this.config;
     const graphics = this.add.graphics();
-    graphics.fillStyle(0xffffff, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
+    graphics.fillStyle(0xf0f0db, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
-      .lineStyle(1.5, 0xa8c5de, 0.2)
+      .lineStyle(1.5, 0x30364f, 0.2)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     this.add.text(x - cardW / 2 + 40, y - cardH / 2 + 40, title, {
       fontSize: '30px',

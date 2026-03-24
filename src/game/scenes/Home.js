@@ -28,7 +28,7 @@ export class Home extends Scene {
     const { width, height } = this.scale;
     const centerX = width / 2;
 
-    this.cameras.main.setBackgroundColor('#ffffff');
+    this.cameras.main.setBackgroundColor('#f0f0db');
 
     // 2. 로고 표시 - 스케일은 요청하신 대로 1.25 유지
     this.add.image(centerX, 260, 'logo').setOrigin(0.5).setScale(1.25);
@@ -53,9 +53,9 @@ export class Home extends Scene {
 
     // 카드 배경 (Rounded Rect)
     const bg = this.add.graphics();
-    bg.fillStyle(0xffffff, 1);
+    bg.fillStyle(0xacbac4, 1);
     bg.fillRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
-    bg.lineStyle(1.5, 0xa8c5de, 0.25);
+    bg.lineStyle(1.5, 0x30364f, 0.25);
     bg.strokeRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
 
     const textLeftMargin = -cardWidth / 2 + 50;
@@ -79,7 +79,7 @@ export class Home extends Scene {
       .text(cardWidth / 2 - 60, 0, '>', {
         fontSize: '40px',
         fontFamily: 'Pretendard, Arial',
-        color: '#a8c5de',
+        color: '#30364f',
       })
       .setOrigin(0.5);
 
@@ -93,25 +93,6 @@ export class Home extends Scene {
       cardHeight,
     );
     container.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
-
-    // 피드백 효과
-    container.on('pointerover', () => {
-      this.tweens.add({ targets: container, scale: 1.02, duration: 100 });
-      bg.clear();
-      bg.fillStyle(0xf9fafb, 1);
-      bg.fillRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
-      bg.lineStyle(2, 0xa8c5de, 0.5);
-      bg.strokeRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
-    });
-
-    container.on('pointerout', () => {
-      this.tweens.add({ targets: container, scale: 1.0, duration: 100 });
-      bg.clear();
-      bg.fillStyle(0xffffff, 1);
-      bg.fillRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
-      bg.lineStyle(1.5, 0xa8c5de, 0.25);
-      bg.strokeRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
-    });
 
     // 클릭 시 이동
     container.on('pointerdown', () => {

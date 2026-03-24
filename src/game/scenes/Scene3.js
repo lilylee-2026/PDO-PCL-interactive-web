@@ -37,7 +37,7 @@ export class Scene3 extends Scene {
     const { width } = this.scale;
     const centerX = width / 2;
     const centerY = 650;
-    this.cameras.main.setBackgroundColor('#ffffff');
+    this.cameras.main.setBackgroundColor('#acbac4');
 
     this.add
       .text(40, 60, '←', { fontSize: '40px', color: '#000000', fontFamily: 'Pretendard, Arial' })
@@ -46,7 +46,7 @@ export class Scene3 extends Scene {
       .on('pointerdown', () => navigateTo(this, 'Home'));
 
     this.add
-      .text(centerX, 60, 'PDO VS PCL', {
+      .text(centerX, 60, '입 당겨보기', {
         fontSize: '32px',
         color: '#1f2937',
         fontFamily: 'Pretendard, Arial',
@@ -161,9 +161,9 @@ export class Scene3 extends Scene {
     const { cardW, cardH } = this.config;
     const graphics = this.add.graphics();
     graphics.setDepth(-1); // 배경 카드는 가장 뒤로
-    graphics.fillStyle(0xffffff, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
+    graphics.fillStyle(0xf0f0db, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
-      .lineStyle(1.5, 0xa8c5de, 0.2)
+      .lineStyle(1.5, 0x30364f, 0.2)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
 
     this.add.text(x - cardW / 2 + 40, y - cardH / 2 + 40, title, {
