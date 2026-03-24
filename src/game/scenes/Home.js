@@ -55,7 +55,7 @@ export class Home extends Scene {
     const bg = this.add.graphics();
     bg.fillStyle(0xacbac4, 1);
     bg.fillRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
-    bg.lineStyle(1.5, 0x30364f, 0.25);
+    bg.lineStyle(1.5, 0x30364f, 1);
     bg.strokeRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
 
     const textLeftMargin = -cardWidth / 2 + 50;

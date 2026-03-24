@@ -388,7 +388,7 @@ export class Scene1 extends Scene {
     const graphics = this.add.graphics();
     graphics.fillStyle(0xf0f0db, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
-      .lineStyle(1.5, 0x30364f, 0.2)
+      .lineStyle(1.5, 0x30364f, 1)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     this.add.text(x - cardW / 2 + 40, y - cardH / 2 + 40, title, {
       fontSize: '30px',
