@@ -28,7 +28,7 @@ export class Home extends Scene {
     const { width, height } = this.scale;
     const centerX = width / 2;
 
-    this.cameras.main.setBackgroundColor('#f0f0db');
+    this.cameras.main.setBackgroundColor('#FAFAE3');
 
     // 2. 로고 표시 - 스케일은 요청하신 대로 1.25 유지
     this.add.image(centerX, 260, 'logo').setOrigin(0.5).setScale(1.25);
@@ -53,9 +53,9 @@ export class Home extends Scene {
 
     // 카드 배경 (Rounded Rect)
     const bg = this.add.graphics();
-    bg.fillStyle(0xacbac4, 1);
+    bg.fillStyle(0xd1dde9, 1);
     bg.fillRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
-    bg.lineStyle(1.5, 0x30364f, 1);
+    bg.lineStyle(1.5, 0x30364f, 0);
     bg.strokeRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 32);
 
     const textLeftMargin = -cardWidth / 2 + 50;
@@ -64,7 +64,7 @@ export class Home extends Scene {
     const titleText = this.add.text(textLeftMargin, -20, data.title, {
       fontSize: '34px',
       fontFamily: 'Pretendard, Arial',
-      color: '#1f2937',
+      color: '#545454',
     });
 
     // 텍스트 (Description)

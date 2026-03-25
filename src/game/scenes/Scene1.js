@@ -63,7 +63,7 @@ export class Scene1 extends Scene {
 
     const { width } = this.scale;
     const centerX = width / 2;
-    this.cameras.main.setBackgroundColor('#acbac4');
+    this.cameras.main.setBackgroundColor('#D1DDE9');
 
     this.add
       .text(40, 60, '←', { fontSize: '40px', color: '#000000', fontFamily: 'Pretendard, Arial' })
@@ -74,7 +74,7 @@ export class Scene1 extends Scene {
     this.add
       .text(centerX, 60, '실 당겨보기', {
         fontSize: '32px',
-        color: '#1f2937',
+        color: '#545454',
         fontFamily: 'Pretendard, Arial',
       })
       .setOrigin(0.5);
@@ -386,13 +386,13 @@ export class Scene1 extends Scene {
   drawCardBg(x, y, title, desc) {
     const { cardW, cardH } = this.config;
     const graphics = this.add.graphics();
-    graphics.fillStyle(0xf0f0db, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
+    graphics.fillStyle(0xfafae3, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
-      .lineStyle(1.5, 0x30364f, 1)
+      .lineStyle(1.5, 0x30364f, 0)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     this.add.text(x - cardW / 2 + 40, y - cardH / 2 + 40, title, {
       fontSize: '30px',
-      color: '#1f2937',
+      color: '#545454',
       fontWeight: 'bold',
       fontFamily: 'Pretendard',
     });

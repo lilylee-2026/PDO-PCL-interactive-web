@@ -19,7 +19,8 @@ export class Scene2 extends Scene {
   create() {
     const { width } = this.scale;
     const centerX = width / 2;
-    this.cameras.main.setBackgroundColor('#acbac4');
+    // 배경색 설정
+    this.cameras.main.setBackgroundColor('#D1DDE9');
 
     this.add
       .text(40, 60, '←', { fontSize: '40px', color: '#000000', fontFamily: 'Pretendard, Arial' })
@@ -30,7 +31,7 @@ export class Scene2 extends Scene {
     this.add
       .text(centerX, 60, '탄성력 테스트', {
         fontSize: '32px',
-        color: '#1f2937',
+        color: '#545454',
         fontFamily: 'Pretendard, Arial',
       })
       .setOrigin(0.5);
@@ -61,24 +62,34 @@ export class Scene2 extends Scene {
     this.add
       .text(centerX - offsetX - 50, threadTopY - 40, 'PDO', {
         fontSize: '24px',
-        color: '#1f2937',
+        color: '#545454',
         fontFamily: 'Pretendard, Arial',
         fontWeight: 'bold',
       })
       .setOrigin(0.5);
 
-    // --- 2. PCL 실 (흰색 및 반투명 설정) ---
+    // --- 2. PCL 실 (회색 테두리 레이어 방식 적용) ---
+    // 테두리용 레이어: 본체보다 아주 미세하게 크게 설정하여 테두리처럼 보이게 함
+    this.thread2Border = this.add
+      .image(centerX + offsetX - 50, threadTopY, 'thread_pcl')
+      .setScale(threadScale + 0.005, threadScale + 0.04) // 세로(두께) 방향으로 더 확장
+      .setAngle(90)
+      .setOrigin(0, 0.5)
+      .setTint(0xbbbbbb); // 연한 회색 테두리
+
+    // 본체 실
     this.thread2 = this.add
       .image(centerX + offsetX - 50, threadTopY, 'thread_pcl')
       .setScale(threadScale)
       .setAngle(90)
       .setOrigin(0, 0.5)
-      .setTint(0xd1d5db) // 중요: 연한 그레이 톤을 주어야 흰 배경에서 형태가 보입니다.
-      .setAlpha(0.5); // 중요: 0.5 정도가 가장 '반투명한 플라스틱' 느낌이 납니다.
+      .setTint(0xffffff)
+      .setAlpha(0.6);
+
     this.add
       .text(centerX + offsetX - 50, threadTopY - 40, 'PCL', {
         fontSize: '24px',
-        color: '#1f2937',
+        color: '#545454',
         fontFamily: 'Pretendard, Arial',
         fontWeight: 'bold',
       })
@@ -100,11 +111,14 @@ export class Scene2 extends Scene {
     const startY = this.sourceWeight.y;
 
     this.sourceWeight.on('drag', (pointer, dragX, dragY) => {
+      if (this.tweens.isTweening(this.sourceWeight)) return;
       this.sourceWeight.x = dragX;
       this.sourceWeight.y = dragY;
     });
 
     this.sourceWeight.on('dragend', (pointer) => {
+      if (this.tweens.isTweening(this.sourceWeight)) return;
+
       const isOverPDO =
         Math.abs(this.sourceWeight.x - this.thread1.x) < 100 && this.sourceWeight.y > topY + 100;
       const isOverPCL =
@@ -121,6 +135,7 @@ export class Scene2 extends Scene {
           pointer.y,
         );
       } else if (isOverPCL && !this.isPclHung) {
+        // PCL일 경우 테두리 레이어도 함께 전달
         this.attachNewWeight(
           this.thread2,
           this.config.pclElasticity,
@@ -129,6 +144,7 @@ export class Scene2 extends Scene {
           'PCL',
           pointer.x,
           pointer.y,
+          this.thread2Border,
         );
       }
 
@@ -151,36 +167,35 @@ export class Scene2 extends Scene {
     });
   }
 
-  attachNewWeight(thread, elasticity, topY, baseScale, type, dropX, dropY) {
+  attachNewWeight(thread, elasticity, topY, baseScale, type, dropX, dropY, borderLayer = null) {
     if (type === 'PDO') this.isPdoHung = true;
     else this.isPclHung = true;
 
-    // 늘어날 목표 스케일 및 위치 계산
     const targetScale = baseScale + this.config.weightPower * elasticity * 0.005;
     const targetThreadLength = thread.width * targetScale;
     const targetBottomY = topY + targetThreadLength;
 
     const hungWeight = this.add.image(thread.x, dropY, 'weight').setScale(0.1);
 
-    // 실 늘어남 애니메이션
+    // 실 늘어남 애니메이션 (테두리가 있다면 함께 애니메이션)
+    const animTargets = borderLayer ? [thread, borderLayer] : [thread];
+
     this.tweens.add({
-      targets: thread,
+      targets: animTargets,
       scaleX: targetScale,
       duration: 1000,
       ease: 'Cubic.easeOut',
     });
 
-    // 무게 추 낙하 및 고정 애니메이션
     this.tweens.add({
       targets: hungWeight,
       y: targetBottomY + 10,
       duration: 1000,
       ease: 'Cubic.easeOut',
       onComplete: () => {
-        // [조건부 모션] PDO가 아닐 때만(즉, PCL만) 흔들림 효과 적용
         if (type !== 'PDO') {
           this.tweens.add({
-            targets: thread,
+            targets: animTargets,
             scaleX: targetScale + 0.015,
             duration: 800,
             yoyo: true,
@@ -197,7 +212,6 @@ export class Scene2 extends Scene {
             ease: 'Sine.easeInOut',
           });
         }
-        // PDO는 여기서 추가 모션 없이 targetScale 상태로 유지됩니다.
       },
     });
   }
@@ -205,13 +219,14 @@ export class Scene2 extends Scene {
   drawCardBg(x, y, title, desc) {
     const { cardW, cardH } = this.config;
     const graphics = this.add.graphics();
-    graphics.fillStyle(0xf0f0db, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
+    graphics.fillStyle(0xfafae3, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
       .lineStyle(1.5, 0x30364f, 1)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
+
     this.add.text(x - cardW / 2 + 40, y - cardH / 2 + 40, title, {
       fontSize: '30px',
-      color: '#1f2937',
+      color: '#545454',
       fontFamily: 'Pretendard',
       fontWeight: 'bold',
     });

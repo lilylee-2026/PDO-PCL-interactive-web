@@ -31,9 +31,9 @@ export const updateExternalNav = (sceneKey) => {
   // 2. 씬에 따른 전체 배경색(Body) 변경
   if (sceneKey === 'Home') {
     // Home일 때 배경색 설정
-    document.getElementById('game-container').style.backgroundColor = '#f0f0db';
+    document.getElementById('game-container').style.backgroundColor = '#FAFAE3';
   } else if (sceneKey.startsWith('Scene')) {
     // Scene1, Scene2, Scene3 등 Scene으로 시작하는 경우 배경색 설정
-    document.getElementById('game-container').style.backgroundColor = '#acbac4';
+    document.getElementById('game-container').style.backgroundColor = '#D1DDE9';
   }
 };

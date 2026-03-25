@@ -12,7 +12,7 @@ const config = {
   parent: 'game-container',
   width: 720,
   height: 1160, // 1280(전체) - 120(하단바)
-  backgroundColor: '#f0f0db',
+  backgroundColor: '#FAFAE3',
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -62,7 +62,7 @@ WebFontLoader.load({
         item.classList.add('active');
 
         // [추가] 배경색 업데이트 로직
-        const bgColor = sceneKey === 'Home' ? '#f0f0db' : '#acbac4';
+        const bgColor = sceneKey === 'Home' ? '#FAFAE3' : '#D1DDE9';
 
         // Body와 Game Container 배경색 변경
         document.getElementById('game-container').style.backgroundColor = bgColor;
