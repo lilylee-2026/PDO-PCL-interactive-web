@@ -53,11 +53,18 @@ html {
   padding-bottom: env(safe-area-inset-bottom); /* iOS 필수 */
   box-sizing: content-box; /* 높이 120px + 패딩이 더해지도록 설정 */
   flex-shrink: 0; /* 중요: 공간이 부족해도 줄어들지 않음 */
-  display: flex;
+  display: none; /* 초기에는 숨김 */
   justify-content: space-around;
   align-items: center;
   background: #f2eacb;
-  //border-top: 1px solid #30364f;
+}
+
+.bottom-nav.hidden {
+  display: none;
+}
+
+.bottom-nav.active {
+  display: flex;
 }
 
 /* 개별 네비게이션 아이템 */

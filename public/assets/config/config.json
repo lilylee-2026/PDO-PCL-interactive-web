@@ -1,4 +1,10 @@
 {
+  "bottom": [
+    { "key": "Home", "label": "홈" },
+    { "key": "Scene1", "label": "실 당겨보기" },
+    { "key": "Scene2", "label": "탄성력 테스트" },
+    { "key": "Scene3", "label": "입 당겨보기" }
+  ],
   "home": {
     "screenData": [
       {
@@ -38,5 +44,6 @@
   "scene3": {
     "title": "PDO / PCL",
     "desc": "입을 아래로 당겨 움직임 정도를 비교해보세요."
-  }
+  },
+  "password": "1234"
 }

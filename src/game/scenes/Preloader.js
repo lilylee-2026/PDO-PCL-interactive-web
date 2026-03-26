@@ -51,8 +51,8 @@ export class Preloader extends Scene {
     const progressBar = this.add.graphics();
     const progressBox = this.add.graphics();
 
-    // 로딩 바 배경 (회색)
-    progressBox.fillStyle(0xa8c5de, 0.8);
+    // 로딩 바 배경
+    progressBox.fillStyle(0xd1dde9, 0.8);
     progressBox.fillRect(width / 2 - 160, height / 2 - 25, 320, 50);
 
     // 로딩 텍스트
@@ -68,7 +68,7 @@ export class Preloader extends Scene {
       .text(width / 2, height / 2, '0%', {
         fontSize: '18px',
         fontFamily: 'Pretendard, Arial',
-        fill: '#ffffff',
+        fill: '#545454',
       })
       .setOrigin(0.5, 0.5);
 
@@ -76,7 +76,7 @@ export class Preloader extends Scene {
     this.load.on('progress', (value) => {
       percentText.setText(parseInt(value * 100) + '%');
       progressBar.clear();
-      progressBar.fillStyle(0xa8c5de, 1); // 로딩 바 채우기 색상
+      progressBar.fillStyle(0xd1dde9, 1); // 로딩 바 채우기 색상
       progressBar.fillRect(width / 2 - 150, height / 2 - 15, 300 * value, 30);
     });
 
@@ -124,6 +124,6 @@ export class Preloader extends Scene {
       }
     }
 
-    this.scene.start('Home');
+    this.scene.start('Password');
   }
 }

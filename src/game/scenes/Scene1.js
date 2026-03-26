@@ -72,7 +72,7 @@ export class Scene1 extends Scene {
       .on('pointerdown', () => navigateTo(this, 'Home'));
 
     this.add
-      .text(centerX, 60, '실 당겨보기', {
+      .text(centerX, 60, this.cache.json.get('config').bottom[1].label, {
         fontSize: '32px',
         color: '#545454',
         fontFamily: 'Pretendard, Arial',
@@ -89,8 +89,8 @@ export class Scene1 extends Scene {
 
     const configData = this.cache.json.get('config');
     const screenData = configData?.scene1 || {
-      liftingSection: { title: 'Lifting', desc: '' },
-      fixingSection: { title: 'Fixing', desc: '' },
+      liftingSection: { title: '', desc: '' },
+      fixingSection: { title: '', desc: '' },
     };
 
     // --- 1. 리프팅 섹션 ---

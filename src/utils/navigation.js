@@ -12,15 +12,27 @@ export const navigateTo = (scene, target) => {
 };
 
 /**
- * HTML 하단 네비게이션 바의 활성화 상태(active) 및 배경색 업데이트
+ * HTML 하단 네비게이션 바의 활성화 상태(active), 표시 여부 및 배경색 업데이트
  * @param {string} sceneKey - 현재 활성화된 씬 이름
  */
 export const updateExternalNav = (sceneKey) => {
+  const nav = document.querySelector('.bottom-nav');
   const navItems = document.querySelectorAll('.nav-item');
+  const gameContainer = document.getElementById('game-container');
 
-  // 1. 네비게이션 아이템 활성화 상태 업데이트
+  if (!nav) return;
+
+  // 1. Password 씬일 때는 내비게이션 바 숨김 처리
+  if (sceneKey === 'Password' || sceneKey === 'Boot' || sceneKey === 'Preloader') {
+    nav.classList.add('hidden');
+  } else {
+    nav.classList.remove('hidden');
+    nav.classList.add('active');
+  }
+
+  // 2. 네비게이션 아이템 활성화 상태 업데이트
   navItems.forEach((item) => {
-    // dataset.scene은 index.html의 data-scene="Scene1" 값을 읽어옵니다.
+    // dataset.scene은 index.html의 data-scene 값을 읽어옵니다.
     if (item.dataset.scene === sceneKey) {
       item.classList.add('active');
     } else {
@@ -28,12 +40,16 @@ export const updateExternalNav = (sceneKey) => {
     }
   });
 
-  // 2. 씬에 따른 전체 배경색(Body) 변경
-  if (sceneKey === 'Home') {
-    // Home일 때 배경색 설정
-    document.getElementById('game-container').style.backgroundColor = '#FAFAE3';
-  } else if (sceneKey.startsWith('Scene')) {
-    // Scene1, Scene2, Scene3 등 Scene으로 시작하는 경우 배경색 설정
-    document.getElementById('game-container').style.backgroundColor = '#D1DDE9';
+  // 3. 씬에 따른 배경색 변경 (Password와 Home은 동일 색상)
+  let bgColor = '#D1DDE9'; // 기본 Scene 배경색
+
+  if (sceneKey === 'Home' || sceneKey === 'Password') {
+    bgColor = '#FAFAE3';
   }
+
+  // DOM 요소들에 배경색 적용
+  if (gameContainer) {
+    gameContainer.style.backgroundColor = bgColor;
+  }
+  document.body.style.backgroundColor = bgColor;
 };

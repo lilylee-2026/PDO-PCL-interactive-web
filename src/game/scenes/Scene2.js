@@ -29,7 +29,7 @@ export class Scene2 extends Scene {
       .on('pointerdown', () => navigateTo(this, 'Home'));
 
     this.add
-      .text(centerX, 60, '탄성력 테스트', {
+      .text(centerX, 60, this.cache.json.get('config').bottom[2].label, {
         fontSize: '32px',
         color: '#545454',
         fontFamily: 'Pretendard, Arial',
@@ -42,8 +42,8 @@ export class Scene2 extends Scene {
   createContentLayout(centerX) {
     const configData = this.cache.json.get('config');
     const screenData = configData?.scene2 || {
-      title: 'PDO VS PCL',
-      desc: '실의 소재에 따른 탄성 비교',
+      title: '',
+      desc: '',
     };
 
     this.drawCardBg(centerX, 650, screenData.title, screenData.desc);
@@ -221,7 +221,7 @@ export class Scene2 extends Scene {
     const graphics = this.add.graphics();
     graphics.fillStyle(0xfafae3, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
-      .lineStyle(1.5, 0x30364f, 1)
+      .lineStyle(1.5, 0x30364f, 0)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
 
     this.add.text(x - cardW / 2 + 40, y - cardH / 2 + 40, title, {

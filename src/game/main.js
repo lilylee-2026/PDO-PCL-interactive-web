@@ -2,10 +2,12 @@ import Phaser from 'phaser';
 import WebFontLoader from 'webfontloader';
 import { Boot } from './scenes/Boot';
 import { Preloader } from './scenes/Preloader';
+import { Password } from './scenes/Password';
 import { Home } from './scenes/Home';
 import { Scene1 } from './scenes/Scene1';
 import { Scene2 } from './scenes/Scene2';
 import { Scene3 } from './scenes/Scene3';
+import { updateExternalNav } from '../utils/navigation.js'; // 네비게이션 유틸 임포트
 
 const config = {
   type: Phaser.AUTO,
@@ -24,10 +26,13 @@ const config = {
     default: 'arcade',
     arcade: {
       gravity: { y: 0 },
-      debug: true,
+      debug: false,
     },
   },
-  scene: [Boot, Preloader, Home, Scene1, Scene2, Scene3],
+  dom: {
+    createContainer: true,
+  },
+  scene: [Boot, Preloader, Password, Home, Scene1, Scene2, Scene3],
 };
 
 // WebFontLoader를 사용하여 폰트 로드
@@ -37,8 +42,15 @@ WebFontLoader.load({
     families: ['Pretendard'],
   },
   active: function () {
+    // 내비게이션 라벨 먼저 적용
+    applyNavLabels();
+
     // 폰트 로드가 완료되면 게임 인스턴스 생성
     const game = new Phaser.Game(config);
+
+    // --- [초기 설정] ---
+    // 첫 화면인 Password 씬에 맞춰 하단 바를 숨깁니다.
+    updateExternalNav('Password');
 
     // --- 외부 HTML에서 Phaser 제어하기 ---
     const navItems = document.querySelectorAll('.nav-item');
@@ -57,19 +69,39 @@ WebFontLoader.load({
         // 2. 선택한 씬 실행
         game.scene.start(sceneKey);
 
-        // 3. UI 활성화 스타일 변경
-        navItems.forEach((nav) => nav.classList.remove('active'));
-        item.classList.add('active');
-
-        // [추가] 배경색 업데이트 로직
-        const bgColor = sceneKey === 'Home' ? '#FAFAE3' : '#D1DDE9';
-
-        // Body와 Game Container 배경색 변경
-        document.getElementById('game-container').style.backgroundColor = bgColor;
+        // 3. UI 및 배경색 통합 업데이트 (utils/navigation.js 내 로직 실행)
+        updateExternalNav(sceneKey);
       });
     });
   },
 });
+
+// --- [추가] JSON 데이터를 읽어와 내비게이션 텍스트를 적용하는 함수 ---
+async function applyNavLabels() {
+  try {
+    const response = await fetch('assets/config/config.json');
+    const data = await response.json();
+
+    // 수정: data.bottom 배열을 직접 참조
+    const bottomNavData = data.bottom;
+
+    if (bottomNavData) {
+      document.querySelectorAll('.nav-item').forEach((item) => {
+        const sceneKey = item.getAttribute('data-scene');
+        const span = item.querySelector('span');
+
+        // bottom 배열에서 key가 일치하는 label 찾기
+        const match = bottomNavData.find((nav) => nav.key === sceneKey);
+
+        if (span && match) {
+          span.textContent = match.label;
+        }
+      });
+    }
+  } catch (error) {
+    console.error('내비게이션 설정 로드 실패:', error);
+  }
+}
 
 function updateHeight() {
   const wrapper = document.getElementById('app-wrapper');

@@ -30,7 +30,7 @@ export class Home extends Scene {
 
     this.cameras.main.setBackgroundColor('#FAFAE3');
 
-    // 2. 로고 표시 - 스케일은 요청하신 대로 1.25 유지
+    // 2. 로고 표시 - 스케일은 1.25 유지
     this.add.image(centerX, 260, 'logo').setOrigin(0.5).setScale(1.25);
 
     // 3. 네비게이션 카드 데이터
