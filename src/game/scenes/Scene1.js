@@ -166,16 +166,22 @@ export class Scene1 extends Scene {
     this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
       // 애니메이션 중에는 드래그 차단
       if (this.tweens.isTweening(gameObject)) return;
+
+      // 고정용 실이 이미 실패 상태라면 드래그 불가
       if (gameObject === this.fixThread && this.isSection2Failed) return;
 
+      // 실제 마우스 이동 거리
       const dragDistance = Math.max(0, pointer.x - pointer.downX);
+      // 저항감이 적용된 이동 거리 (설정값 0.1 적용 시 10분의 1만 움직임)
+      const slowDragDistance = dragDistance * this.config.fixDragSensitivity;
 
       if (gameObject === this.liftingThread) {
-        const offset = Phaser.Math.Clamp(dragDistance, 0, this.config.maxDragRange);
+        // 리프팅 실: 저항감을 적용하여 최대 범위 내에서 클램프
+        const offset = Phaser.Math.Clamp(slowDragDistance, 0, this.config.maxDragRange);
         gameObject.scaleX = this.baseThreadScale + offset / this.threadStretchDenom;
         this.updateLiftingSkin(offset);
       } else if (gameObject === this.fixThread) {
-        const slowDragDistance = dragDistance * this.config.fixDragSensitivity;
+        // 고정용 실: 동일하게 저항감 적용
         const offset = Phaser.Math.Clamp(slowDragDistance, 0, this.config.maxDragRange);
         gameObject.scaleX = this.baseThreadScale + offset / this.threadStretchDenom;
         this.maxFixedDist = offset;
@@ -184,13 +190,15 @@ export class Scene1 extends Scene {
     });
 
     this.input.on('dragend', (pointer, gameObject) => {
-      // 이미 복구 애니메이션 중이라면 중복 방지
       if (this.tweens.isTweening(gameObject)) return;
 
       const dragDistance = Math.max(0, pointer.x - pointer.downX);
+      const slowDragDistance = dragDistance * this.config.fixDragSensitivity;
 
       if (gameObject === this.liftingThread) {
-        if (dragDistance >= this.config.maxDragRange) {
+        // 감도가 적용된 거리가 최대치에 도달했는지 확인
+        if (slowDragDistance >= this.config.maxDragRange) {
+          // 리프팅 성공
           this.liftingThread.disableInteractive();
           this.currentLiftBumpyIntensity = this.config.postLiftBumpyIntensity;
           this.updateLiftingSkin(0);
@@ -202,7 +210,7 @@ export class Scene1 extends Scene {
             ease: 'Back.easeOut',
           });
         } else {
-          // 실패 시 원복 - 애니메이션 동안 상호작용 비활성화
+          // 리프팅 실패 (중도 포기): 원복 애니메이션
           gameObject.disableInteractive();
           this.tweens.add({
             targets: gameObject,
@@ -215,16 +223,17 @@ export class Scene1 extends Scene {
               this.updateLiftingSkin(Math.max(0, currentOffset));
             },
             onComplete: () => {
-              gameObject.setInteractive(); // 복귀 후 다시 활성화
+              gameObject.setInteractive();
             },
           });
         }
       } else if (gameObject === this.fixThread && !this.isSection2Failed) {
-        const slowDragDistance = dragDistance * this.config.fixDragSensitivity;
+        // 고정용 실 판단 로직
         if (slowDragDistance >= this.config.maxDragRange) {
+          // 너무 많이 당겨서 조직 손상(실패) 트리거
           this.triggerSection2Failure(gameObject);
         } else {
-          // 중간에 놓았을 때 원복 - 애니메이션 동안 상호작용 비활성화
+          // 중간에 놓았을 때 제자리로 원복
           gameObject.disableInteractive();
           this.tweens.add({
             targets: gameObject,
@@ -239,7 +248,7 @@ export class Scene1 extends Scene {
             },
             onComplete: () => {
               this.maxFixedDist = 0;
-              gameObject.setInteractive(); // 복귀 후 다시 활성화
+              gameObject.setInteractive();
             },
           });
         }
@@ -254,20 +263,18 @@ export class Scene1 extends Scene {
     const worldThreadX = this.fixContainer.x + gameObject.x;
     const currentWidth = gameObject.width * gameObject.scaleX;
 
-    this.time.delayedCall(1000, () => {
-      this.errorMark.setPosition(worldThreadX + currentWidth / 2 - 20, 880).setAlpha(1);
-      this.time.delayedCall(3000, () => {
-        this.errorMark.setVisible(false).setAlpha(0);
-        gameObject.setVisible(false);
-        gameObject.scaleX = this.baseThreadScale;
-        this.tweens.add({
-          targets: this,
-          maxFixedDist: 0,
-          duration: 2500,
-          ease: 'Cubic.easeOut',
-          onUpdate: () => this.updateFixedSkin(this.maxFixedDist),
-          onComplete: () => this.makeSkinTiltable(),
-        });
+    this.errorMark.setPosition(worldThreadX + currentWidth / 2 - 20, 880).setAlpha(1);
+    this.time.delayedCall(3000, () => {
+      this.errorMark.setVisible(false).setAlpha(0);
+      gameObject.setVisible(false);
+      gameObject.scaleX = this.baseThreadScale;
+      this.tweens.add({
+        targets: this,
+        maxFixedDist: 0,
+        duration: 2500,
+        ease: 'Cubic.easeOut',
+        onUpdate: () => this.updateFixedSkin(this.maxFixedDist),
+        onComplete: () => this.makeSkinTiltable(),
       });
     });
   }
