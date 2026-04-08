@@ -44,7 +44,7 @@ export const updateExternalNav = (sceneKey) => {
   let bgColor = '#D1DDE9'; // 기본 Scene 배경색
 
   if (sceneKey === 'Home' || sceneKey === 'Password') {
-    bgColor = '#FAFAE3';
+    bgColor = '#fefdf1';
   }
 
   // DOM 요소들에 배경색 적용

@@ -219,7 +219,7 @@ export class Scene2 extends Scene {
   drawCardBg(x, y, title, desc) {
     const { cardW, cardH } = this.config;
     const graphics = this.add.graphics();
-    graphics.fillStyle(0xfafae3, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
+    graphics.fillStyle(0xfefdf1, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
       .lineStyle(1.5, 0x30364f, 0)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);

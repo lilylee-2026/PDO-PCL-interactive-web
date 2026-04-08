@@ -28,7 +28,7 @@ export class Home extends Scene {
     const { width, height } = this.scale;
     const centerX = width / 2;
 
-    this.cameras.main.setBackgroundColor('#FAFAE3');
+    this.cameras.main.setBackgroundColor('#fefdf1');
 
     // 2. 로고 표시 - 스케일은 1.25 유지
     this.add.image(centerX, 260, 'logo').setOrigin(0.5).setScale(1.25);

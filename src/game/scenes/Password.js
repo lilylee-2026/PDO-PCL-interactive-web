@@ -16,7 +16,7 @@ export class Password extends Scene {
     const { width, height } = this.scale;
     const centerX = width / 2;
 
-    this.cameras.main.setBackgroundColor('#FAFAE3');
+    this.cameras.main.setBackgroundColor('#fefdf1');
 
     const configData = this.cache.json.get('config');
     const passwordData = configData?.password;

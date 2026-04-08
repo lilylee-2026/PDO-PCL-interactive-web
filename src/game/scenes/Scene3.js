@@ -180,7 +180,7 @@ export class Scene3 extends Scene {
     const { cardW, cardH } = this.config;
     const graphics = this.add.graphics();
     graphics.setDepth(-1); // 배경 카드는 가장 뒤로
-    graphics.fillStyle(0xfafae3, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
+    graphics.fillStyle(0xfefdf1, 1).fillRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);
     graphics
       .lineStyle(1.5, 0x30364f, 0)
       .strokeRoundedRect(x - cardW / 2, y - cardH / 2, cardW, cardH, 32);

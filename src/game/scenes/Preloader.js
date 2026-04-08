@@ -45,7 +45,7 @@ export class Preloader extends Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    this.cameras.main.setBackgroundColor('#FAFAE3');
+    this.cameras.main.setBackgroundColor('#fefdf1');
 
     // 1. 로딩 바 그래픽 추가
     const progressBar = this.add.graphics();

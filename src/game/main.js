@@ -14,7 +14,7 @@ const config = {
   parent: 'game-container',
   width: 720,
   height: 1160, // 1280(전체) - 120(하단바)
-  backgroundColor: '#FAFAE3',
+  backgroundColor: '#fefdf1',
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
